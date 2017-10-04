@@ -7,19 +7,19 @@ require("include/rss_util.php");
 echo "<div id=\"content\">\n";
 echo "<div id=\"content-left\">\n";
 
-$query = "SELECT items.id AS id,feedTitle,feedLink,itemTitle,itemPubDate,itemLink,itemDesc FROM feeds,items WHERE feeds.displayColumn=1 AND feeds.id=items.id";
+$query = "SELECT items.id AS id,feedTitle,feedLink,itemTitle,itemPubDate,itemLink,itemDesc,itemImg FROM feeds,items WHERE feeds.displayColumn=1 AND feeds.id=items.id";
 DisplayColumn($db, $query);
 
 echo "</div>\n";
 echo "<div id=\"content-middle\">\n";
 
-$query = "SELECT items.id AS id,feedTitle,feedLink,itemTitle,itemPubDate,itemLink,itemDesc FROM feeds,items WHERE feeds.displayColumn=2 AND feeds.id=items.id";
+$query = "SELECT items.id AS id,feedTitle,feedLink,itemTitle,itemPubDate,itemLink,itemDesc,itemImg FROM feeds,items WHERE feeds.displayColumn=2 AND feeds.id=items.id";
 DisplayColumn($db, $query);
 
 echo "</div>\n";
 echo "<div id=\"content-right\">\n";
 
-$query = "SELECT items.id AS id,feedTitle,feedLink,itemTitle,itemPubDate,itemLink,itemDesc FROM feeds,items WHERE feeds.displayColumn=3 AND feeds.id=items.id";
+$query = "SELECT items.id AS id,feedTitle,feedLink,itemTitle,itemPubDate,itemLink,itemDesc,itemImg FROM feeds,items WHERE feeds.displayColumn=3 AND feeds.id=items.id";
 DisplayColumn($db, $query);
 
 echo "</div>\n";
@@ -31,10 +31,10 @@ function DisplayColumn($db, $query)
 		$query .= " WHERE id=" . $_GET['feed'];
 	}
 	$rows = Query($db, $query);
-	$rssItems = LoadCachedItems($rows);
+	//$rssItems = LoadCachedItems($rows);
 
 	$prev = NULL;
-	foreach ($rssItems as $item) {
+	foreach ($rows as $item) {
 		DisplayItem($prev, $item);
 		$prev = $item;
 	}
@@ -44,7 +44,7 @@ function DisplayItem($prev, $item)
 {
     echo "<article>";
 
-    // Separator (or not) and feed title
+// Separator (or not) and feed title
     if ($prev == NULL || $prev['feedTitle'] != $item['feedTitle'] ) {
 	echo "<div class=\"itemSep\"></div>\n";
 
@@ -92,7 +92,11 @@ function DisplayItem($prev, $item)
 
     }
     echo "</div>\n";
-
+	if (($item['itemImg'] != NULL) && (strlen($item['itemImg']) > 0)) {
+		echo "<img src=\"";
+		echo $item['itemImg'];
+		echo "\" style=\"width:100%;\" />";
+	}
     // Item description
     echo "<div class=\"itemDesc\">" . $item['itemDesc'] . "</div>\n";
     echo "</article>\n";

@@ -23,14 +23,13 @@ foreach ($rows as $feed) {
 	$content->enable_order_by_date(false);
 	$content->set_cache_location($_SERVER['DOCUMENT_ROOT'] . '/cache');
 	$content->init();
-
+	
 	echo "<div>";
 	echo $content->get_title();
 	echo "</div>\n";
-
-        // Display each RSS item
+        
+	// Display each RSS item
 	foreach ($content->get_items() as $item) {
-
 		// Check whether item already exists in the items table
 		$itemquery =
 			"SELECT * FROM items WHERE id=" .
@@ -42,13 +41,15 @@ foreach ($rows as $feed) {
 			"\"";
 
 		echo "itemquery=\"" . $itemquery . "\"\n";
-
+		echo "<br><br><i>";
+		echo $item->get_enclosure()->get_link();
+		echo "</i><br><br>";
 		$itemrows = Query($db, $itemquery);
 		if (count($itemrows) == 0) {
 			echo "<div><b>";
 			echo $item->get_title();
 			echo "</b></div>";
-
+			
 			echo "<div>";
 			echo $item->get_local_date();
 			echo "</div>";
@@ -61,7 +62,7 @@ foreach ($rows as $feed) {
 			if ($item->get_title() == NULL) {
 
 			$insertquery =
-				"INSERT INTO items (id,feedTitle,feedLink,itemPubDate,itemLink,itemDesc) VALUES (" .
+				"INSERT INTO items (id,feedTitle,feedLink,itemPubDate,itemLink,itemDesc,itemImg) VALUES (" .
 				$feed['id'] . ",'" . 
 				$item->get_feed()->get_title() .
 				"','" .
@@ -72,12 +73,14 @@ foreach ($rows as $feed) {
 				$item->get_permalink() .
 				"','" .
 				RemoveLinks($item->get_description()) .
+				"','" .
+				$item->get_enclosure()->get_link() .
 				"')";
 
 			} else {
 
 			$insertquery =
-				"INSERT INTO items (id,feedTitle,feedLink,itemTitle,itemPubDate,itemLink,itemDesc) VALUES (" .
+				"INSERT INTO items (id,feedTitle,feedLink,itemTitle,itemPubDate,itemLink,itemDesc,itemImg) VALUES (" .
 				$feed['id'] . ",'" . 
 				$item->get_feed()->get_title() .
 				"','" .
@@ -90,6 +93,8 @@ foreach ($rows as $feed) {
 				$item->get_permalink() .
 				"','" .
 				RemoveLinks($item->get_description()) .
+				"','" .
+				$item->get_enclosure()->get_link() .
 				"')";
 
 			}
